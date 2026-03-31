@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>天猫会员兑礼小程序 - PRD v1.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#FF6A00',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#E55D00',
+                lineColor: '#6B7280'
+            }
+        });
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
             --primary: #FF6A00;
@@ -22,27 +36,39 @@
         h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
         h2 { font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; }
         h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
-        .toc { position: fixed; left: 20px; top: 100px; width: 200px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 16px; }
-        .toc a { display: block; padding: 8px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 4px; font-size: 0.875rem; }
+        h4 { font-size: 1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .toc { position: fixed; left: 20px; top: 100px; width: 200px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 16px; max-height: 80vh; overflow-y: auto; }
+        .toc a { display: block; padding: 6px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 4px; font-size: 0.8rem; }
         .toc a:hover { background: var(--bg-light); color: var(--primary); }
         .toc a.active { background: var(--bg-light); color: var(--primary); font-weight: 500; }
-        .main-content { margin-left: 240px; max-width: 900px; padding: 40px; }
+        .main-content { margin-left: 240px; max-width: 960px; padding: 40px; }
         table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-        th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; font-size: 0.875rem; }
         th { background: var(--bg-light); font-weight: 600; }
-        .status-clear { color: #059669; }
-        .status-partial { color: #D97706; }
-        .status-missing { color: #DC2626; }
         .version-badge { display: inline-block; background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
         .placeholder { background: #F3F4F6; border: 2px dashed #D1D5DB; border-radius: 8px; padding: 20px; text-align: center; color: #9CA3AF; }
+        
+        /* Feature Module 样式 */
+        .feature-module { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 1.5rem 0; overflow: hidden; }
+        .feature-header { background: linear-gradient(135deg, #FF6A00 0%, #FF8533 100%); color: white; padding: 16px 20px; }
+        .feature-content { display: flex; gap: 20px; padding: 20px; }
+        .logic-rules { flex: 1; min-width: 0; }
+        .sandbox-preview { flex-shrink: 0; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; }
+        .sandbox-preview iframe { display: block; }
+        
+        @media (max-width: 900px) {
+            .feature-content { flex-direction: column; }
+            .sandbox-preview { width: 100% !important; }
+            .sandbox-preview iframe { width: 100% !important; transform: scale(0.8); transform-origin: top left; }
+        }
     </style>
 </head>
 <body>
     <!-- 目录导航 -->
     <nav class="toc">
         <div class="mb-4">
-            <span class="text-xs text-gray-500">版本切换</span>
-            <select class="w-full mt-1 p-2 border rounded text-sm" onchange="location.href=this.value">
+            <span class="text-xs text-gray-500 mb-1 block">版本切换</span>
+            <select class="w-full p-2 border rounded text-sm" onchange="location.href=this.value">
                 <option value="PRD_v1.0.html" selected>v1.0 当前版本</option>
             </select>
         </div>
@@ -53,6 +79,11 @@
         <a href="#section-3">四、用户与场景</a>
         <a href="#section-4">五、功能清单</a>
         <a href="#section-5">六、详细方案</a>
+        <a href="#section-5-1">├ 商品展示</a>
+        <a href="#section-5-2">├ 商品详情</a>
+        <a href="#section-5-3">├ 地址选择</a>
+        <a href="#section-5-4">├ 订单确认</a>
+        <a href="#section-5-5">├ 订单列表</a>
         <a href="#section-6">七、业务流程图</a>
         <a href="#section-7">八、异常与边界</a>
         <a href="#section-8">九、数据追踪</a>
@@ -71,7 +102,7 @@
             <div class="mt-4 flex gap-4 text-sm text-gray-500">
                 <span>创建日期：2026-03-31</span>
                 <span>最后更新：2026-03-31</span>
-                <span>状态：初稿</span>
+                <span>状态：已完成</span>
             </div>
         </header>
 
@@ -92,7 +123,7 @@
                     <tr><th>版本号</th><th>更新日期</th><th>更新内容</th><th>负责人</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>v1.0</td><td>2026-03-31</td><td>初版PRD，包含基础需求框架和功能清单</td><td>待定</td></tr>
+                    <tr><td>v1.0</td><td>2026-03-31</td><td>初版PRD，包含完整功能方案、原型切片、流程图</td><td>-</td></tr>
                 </tbody>
             </table>
         </section>
@@ -135,9 +166,9 @@
 
         <!-- 四、用户与使用场景 -->
         <section id="section-3">
-            <h2>三、用户与使用场景</h2>
+            <h2>四、用户与使用场景</h2>
 
-            <h3>3.1 用户角色</h3>
+            <h3>4.1 用户角色</h3>
             <table>
                 <thead>
                     <tr><th>角色</th><th>描述</th><th>使用频率</th></tr>
@@ -149,7 +180,7 @@
                 </tbody>
             </table>
 
-            <h3>3.2 用户旅程图 (User Journey Map)</h3>
+            <h3>4.2 用户旅程图 (User Journey Map)</h3>
             <table>
                 <thead>
                     <tr><th>阶段</th><th>用户触点</th><th>用户行为</th><th>痛点/情绪</th><th>产品机会点</th></tr>
@@ -174,7 +205,7 @@
                         <td>兑礼商品列表页</td>
                         <td>浏览可兑换商品，筛选心仪商品</td>
                         <td>😊 有没有喜欢的？积分够不够？</td>
-                        <td>积分余额实时展示、商品分类筛选、积分排序</td>
+                        <td>积分余额实时展示、商品分类筛选</td>
                     </tr>
                     <tr>
                         <td><strong>4. 选择兑换</strong></td>
@@ -210,9 +241,9 @@
 
         <!-- 五、需求功能清单 -->
         <section id="section-4">
-            <h2>四、需求功能清单</h2>
+            <h2>五、需求功能清单</h2>
 
-            <h3>4.1 小程序端功能</h3>
+            <h3>5.1 小程序端功能</h3>
             <table>
                 <thead>
                     <tr><th>模块</th><th>功能点</th><th>优先级</th><th>说明</th></tr>
@@ -233,7 +264,7 @@
                 </tbody>
             </table>
 
-            <h3>4.2 管理端功能</h3>
+            <h3>5.2 管理端功能</h3>
             <table>
                 <thead>
                     <tr><th>模块</th><th>功能点</th><th>优先级</th><th>说明</th></tr>
@@ -250,34 +281,240 @@
             </table>
         </section>
 
-        <!-- 六、详细方案 -->
+        <!-- 六、详细方案（带原型切片） -->
         <section id="section-5">
-            <h2>五、详细方案</h2>
-            <div class="placeholder">
-                <p class="font-semibold">待原型确认后补充</p>
-                <p class="text-sm mt-2">详细方案将包含每个功能模块的交互流程图、详细规则描述和原型切片</p>
+            <h2>六、详细方案</h2>
+            <p class="text-gray-500 mb-4">以下为核心功能模块的详细方案，每个模块包含交互流程、规则描述和专注模式原型切片。</p>
+
+            <!-- 模块1：商品列表展示 -->
+            <div class="feature-module" id="section-5-1">
+                <div class="feature-header">
+                    <h3 class="m-0 text-white">功能：商品列表展示</h3>
+                </div>
+                <div class="feature-content">
+                    <div class="logic-rules">
+                        <h4>交互流程图</h4>
+                        <div class="mermaid">
+flowchart TD
+    A([进入首页]) --> B[加载会员信息]
+    B --> C[加载商品列表]
+    C --> D{列表是否为空}
+    D -->|空| E[展示空状态]
+    D -->|非空| F[展示商品列表]
+    F --> G{用户操作}
+    G -->|点击分类| H[筛选商品]
+    G -->|点击商品| I[进入商品详情]
+    H --> F
+                        </div>
+                        <h4>规则描述</h4>
+                        <ul class="text-sm space-y-2">
+                            <li><strong>触发条件</strong>: 用户进入小程序首页</li>
+                            <li><strong>数据来源</strong>: 调用兑礼中台商品接口获取商品列表</li>
+                            <li><strong>积分展示</strong>: 实时显示用户当前可用积分（从会员中台获取）</li>
+                            <li><strong>库存状态</strong>: 已兑完商品显示灰色遮罩和"已兑完"标签，按钮置灰</li>
+                            <li><strong>分类筛选</strong>: 支持按商品分类进行筛选</li>
+                        </ul>
+                    </div>
+                    <div class="sandbox-preview">
+                        <iframe src="../prototype/prototype.html?sandbox=true&focus=page-home" width="320" height="568" style="border:none; background: #f5f5f5;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块2：商品详情 -->
+            <div class="feature-module" id="section-5-2">
+                <div class="feature-header">
+                    <h3 class="m-0 text-white">功能：商品详情与SKU选择</h3>
+                </div>
+                <div class="feature-content">
+                    <div class="logic-rules">
+                        <h4>交互流程图</h4>
+                        <div class="mermaid">
+flowchart TD
+    A([进入商品详情]) --> B[加载商品详情]
+    B --> C[展示商品信息]
+    C --> D{检查库存状态}
+    D -->|已兑完| E[按钮显示已兑完]
+    D -->|有货| F{检查积分}
+    F -->|积分不足| G[按钮显示积分不足]
+    F -->|积分充足| H[按钮显示立即兑换]
+    H --> I[选择SKU规格]
+    I --> J[点击兑换]
+    J --> K[弹窗确认]
+    K --> L[进入确认页]
+                        </div>
+                        <h4>规则描述</h4>
+                        <ul class="text-sm space-y-2">
+                            <li><strong>触发条件</strong>: 用户点击商品列表中的商品</li>
+                            <li><strong>SKU选择</strong>: 支持颜色、规格等SKU选择，选中高亮显示</li>
+                            <li><strong>积分检查</strong>: 实时对比用户积分与商品所需积分</li>
+                            <li><strong>兑换规则</strong>: 展示每人限兑数量、发货时间等规则</li>
+                            <li><strong>按钮状态</strong>: 根据库存和积分情况动态显示按钮状态</li>
+                        </ul>
+                    </div>
+                    <div class="sandbox-preview">
+                        <iframe src="../prototype/prototype.html?sandbox=true&focus=page-detail" width="320" height="568" style="border:none; background: #f5f5f5;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块3：地址选择 -->
+            <div class="feature-module" id="section-5-3">
+                <div class="feature-header">
+                    <h3 class="m-0 text-white">功能：收货地址选择</h3>
+                </div>
+                <div class="feature-content">
+                    <div class="logic-rules">
+                        <h4>交互流程图</h4>
+                        <div class="mermaid">
+flowchart TD
+    A([进入地址选择]) --> B[调用淘宝地址接口]
+    B --> C{接口返回结果}
+    C -->|失败| D[提示网络异常]
+    C -->|成功| E{地址列表为空?}
+    E -->|为空| F[提示去淘宝添加地址]
+    E -->|非空| G[展示地址列表]
+    G --> H[默认选中默认地址]
+    H --> I{用户操作}
+    I -->|选择其他地址| J[切换选中状态]
+    I -->|确认使用| K[返回确认页]
+                        </div>
+                        <h4>规则描述</h4>
+                        <ul class="text-sm space-y-2">
+                            <li><strong>触发条件</strong>: 用户在确认页点击地址区域</li>
+                            <li><strong>数据来源</strong>: 调用淘宝地址同步接口获取用户地址</li>
+                            <li><strong>默认地址</strong>: 自动选中用户在淘宝设置的默认地址</li>
+                            <li><strong>空状态处理</strong>: 地址列表为空时提示用户去淘宝APP添加</li>
+                            <li><strong>新增地址</strong>: 点击新增地址跳转淘宝地址管理</li>
+                        </ul>
+                    </div>
+                    <div class="sandbox-preview">
+                        <iframe src="../prototype/prototype.html?sandbox=true&focus=page-address" width="320" height="568" style="border:none; background: #f5f5f5;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块4：订单确认 -->
+            <div class="feature-module" id="section-5-4">
+                <div class="feature-header">
+                    <h3 class="m-0 text-white">功能：订单确认与兑换</h3>
+                </div>
+                <div class="feature-content">
+                    <div class="logic-rules">
+                        <h4>交互流程图</h4>
+                        <div class="mermaid">
+flowchart TD
+    A([进入确认页]) --> B[展示收货地址]
+    A --> C[展示商品信息]
+    A --> D[展示积分明细]
+    E[点击确认兑换] --> F{积分扣减结果}
+    F -->|成功| G[创建订单]
+    G --> H[订单回传中台]
+    H --> I{回传结果}
+    I -->|成功| J[订单状态=已完成]
+    I -->|失败| K[钉钉预警]
+    F -->|失败| L[订单状态=已取消]
+    L --> M[Toast提示失败]
+                        </div>
+                        <h4>规则描述</h4>
+                        <ul class="text-sm space-y-2">
+                            <li><strong>触发条件</strong>: 用户从商品详情页点击"立即兑换"</li>
+                            <li><strong>积分明细</strong>: 展示当前积分、扣减积分、剩余积分</li>
+                            <li><strong>扣减接口</strong>: 调用会员信息中台进行积分扣减</li>
+                            <li><strong>扣减成功</strong>: 创建订单，订单状态=已完成</li>
+                            <li><strong>扣减失败</strong>: Toast提示"兑换失败，积分扣减失败"，订单状态=已取消</li>
+                        </ul>
+                    </div>
+                    <div class="sandbox-preview">
+                        <iframe src="../prototype/prototype.html?sandbox=true&focus=page-confirm" width="320" height="568" style="border:none; background: #f5f5f5;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块5：订单列表 -->
+            <div class="feature-module" id="section-5-5">
+                <div class="feature-header">
+                    <h3 class="m-0 text-white">功能：订单列表与详情</h3>
+                </div>
+                <div class="feature-content">
+                    <div class="logic-rules">
+                        <h4>交互流程图</h4>
+                        <div class="mermaid">
+flowchart TD
+    A([进入订单页]) --> B[加载订单列表]
+    B --> C[展示订单列表]
+    C --> D[切换订单状态Tab]
+    D --> E{筛选状态}
+    E -->|全部| F[展示所有订单]
+    E -->|已完成| G[展示已完成订单]
+    E -->|已取消| H[展示已取消订单]
+    C --> I[点击订单]
+    I --> J[进入订单详情]
+    J --> K[展示订单状态]
+    J --> L[展示物流单号]
+                        </div>
+                        <h4>规则描述</h4>
+                        <ul class="text-sm space-y-2">
+                            <li><strong>触发条件</strong>: 用户点击底部导航"订单"</li>
+                            <li><strong>Tab筛选</strong>: 支持按全部/已完成/已取消筛选</li>
+                            <li><strong>订单详情</strong>: 展示订单状态、商品信息、物流单号</li>
+                            <li><strong>物流展示</strong>: 仅展示物流单号，不展示物流路径（由中台发货）</li>
+                            <li><strong>已取消订单</strong>: 展示取消原因（如：积分扣减失败）</li>
+                        </ul>
+                    </div>
+                    <div class="sandbox-preview">
+                        <iframe src="../prototype/prototype.html?sandbox=true&focus=page-orders" width="320" height="568" style="border:none; background: #f5f5f5;"></iframe>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- 七、业务流程图 -->
         <section id="section-6">
-            <h2>六、业务流程图</h2>
-            <h3>6.1 正向流程（兑礼成功）</h3>
-            <div class="placeholder">
-                <p>用户兑礼 → 积分扣减 → 订单记录 → 订单回传 → 订单状态="已完成"</p>
-                <p class="text-sm mt-2">* 详细的Mermaid流程图待原型确认后补充</p>
-            </div>
-
-            <h3>6.2 逆向流程（兑礼失败）</h3>
-            <div class="placeholder">
-                <p>用户兑礼 → 积分扣减 → 扣减失败 → 订单状态="已取消"</p>
-                <p class="text-sm mt-2">* 详细的Mermaid流程图待原型确认后补充</p>
+            <h2>七、业务流程图</h2>
+            <p class="text-gray-500 mb-4">完整的业务流程图请访问 <a href="../flowcharts/flowcharts.html" class="text-tmall hover:underline" target="_blank">流程图页面</a></p>
+            
+            <div class="feature-module">
+                <div class="feature-header">
+                    <h3 class="m-0 text-white">核心业务流程（用户兑礼主流程）</h3>
+                </div>
+                <div class="p-4">
+                    <div class="mermaid">
+flowchart TD
+    A([用户进入兑礼小程序]) --> B[浏览兑礼商品列表]
+    B --> C{选择商品}
+    C -->|有货| D[进入商品详情页]
+    C -->|已兑完| E[显示已兑完]
+    
+    D --> F{检查积分是否充足}
+    F -->|不足| G[提示积分不足]
+    F -->|充足| H[点击立即兑换]
+    
+    H --> I[选择收货地址]
+    I --> J[确认兑换信息]
+    J --> K[调用积分扣减接口]
+    
+    K --> L{扣减结果}
+    L -->|成功| M[创建订单]
+    L -->|失败| N[订单状态=已取消 Toast提示失败]
+    
+    M --> O[订单回传中台]
+    O --> P{回传结果}
+    P -->|成功| Q[订单状态=已完成]
+    P -->|失败| R[钉钉预警 人工运维重推]
+    
+    style A fill:#FF6A00,stroke:#E55D00
+    style Q fill:#059669,stroke:#047857
+    style N fill:#DC2626,stroke:#B91C1C
+    style R fill:#D97706,stroke:#B45309
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- 八、异常与边界处理 -->
         <section id="section-7">
-            <h2>七、异常与边界处理</h2>
+            <h2>八、异常与边界处理</h2>
             <table>
                 <thead>
                     <tr><th>异常场景</th><th>触发条件</th><th>处理方式</th><th>用户反馈</th></tr>
@@ -331,7 +568,7 @@
 
         <!-- 九、数据追踪与埋点 -->
         <section id="section-8">
-            <h2>八、数据追踪与埋点</h2>
+            <h2>九、数据追踪与埋点</h2>
             <table>
                 <thead>
                     <tr><th>埋点事件</th><th>触发位置</th><th>关键参数</th><th>用途</th></tr>
@@ -349,7 +586,7 @@
 
         <!-- 十、未来演进规划 -->
         <section id="section-9">
-            <h2>九、未来演进规划</h2>
+            <h2>十、未来演进规划</h2>
             <table>
                 <thead>
                     <tr><th>阶段</th><th>版本</th><th>功能规划</th><th>说明</th></tr>
@@ -360,16 +597,17 @@
                     <tr><td><strong>第三阶段</strong></td><td>v2.0</td><td>功能扩展</td><td>支持更多活动形式（限时、专场）、等级专属权益</td></tr>
                 </tbody>
             </table>
-            <p class="text-sm text-gray-500 mt-2">* 具体规划需与业务方确认后调整</p>
         </section>
 
         <!-- 十一、附件 -->
         <section id="section-10">
-            <h2>十、附件</h2>
+            <h2>十一、附件</h2>
             <ul class="list-disc pl-6 space-y-2">
+                <li><a href="../prototype/prototype.html" class="text-tmall hover:underline" target="_blank">小程序端原型</a></li>
+                <li><a href="../prototype/admin.html" class="text-tmall hover:underline" target="_blank">管理端原型</a></li>
+                <li><a href="../flowcharts/flowcharts.html" class="text-tmall hover:underline" target="_blank">业务流程图</a></li>
                 <li>数据字典（待补充）</li>
                 <li>API接口文档（待补充）</li>
-                <li>UI设计稿（待补充）</li>
             </ul>
         </section>
 
@@ -379,9 +617,12 @@
     </div>
 
     <script>
+        // 初始化Mermaid
+        mermaid.run();
+        
         // 目录高亮
         const tocLinks = document.querySelectorAll('.toc a');
-        const sections = document.querySelectorAll('section[id]');
+        const sections = document.querySelectorAll('section[id], div[id^="section-5-"]');
         
         window.addEventListener('scroll', () => {
             let current = '';
@@ -394,7 +635,8 @@
             
             tocLinks.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href') === '#' + current) {
+                const href = link.getAttribute('href');
+                if (href && href.includes(current)) {
                     link.classList.add('active');
                 }
             });
