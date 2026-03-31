@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天猫会员兑礼小程序 - PRD v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #FF6A00;
+            --primary-dark: #E55D00;
+            --bg-light: #FFF7ED;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .toc { position: fixed; left: 20px; top: 100px; width: 200px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 16px; }
+        .toc a { display: block; padding: 8px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 4px; font-size: 0.875rem; }
+        .toc a:hover { background: var(--bg-light); color: var(--primary); }
+        .toc a.active { background: var(--bg-light); color: var(--primary); font-weight: 500; }
+        .main-content { margin-left: 240px; max-width: 900px; padding: 40px; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        th { background: var(--bg-light); font-weight: 600; }
+        .status-clear { color: #059669; }
+        .status-partial { color: #D97706; }
+        .status-missing { color: #DC2626; }
+        .version-badge { display: inline-block; background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+        .placeholder { background: #F3F4F6; border: 2px dashed #D1D5DB; border-radius: 8px; padding: 20px; text-align: center; color: #9CA3AF; }
+    </style>
+</head>
+<body>
+    <!-- 目录导航 -->
+    <nav class="toc">
+        <div class="mb-4">
+            <span class="text-xs text-gray-500">版本切换</span>
+            <select class="w-full mt-1 p-2 border rounded text-sm" onchange="location.href=this.value">
+                <option value="PRD_v1.0.html" selected>v1.0 当前版本</option>
+            </select>
+        </div>
+        <div class="text-xs text-gray-500 mb-2 font-semibold">目录导航</div>
+        <a href="#section-0">一、项目信息</a>
+        <a href="#section-1">二、需求背景</a>
+        <a href="#section-2">三、需求目标</a>
+        <a href="#section-3">四、用户与场景</a>
+        <a href="#section-4">五、功能清单</a>
+        <a href="#section-5">六、详细方案</a>
+        <a href="#section-6">七、业务流程图</a>
+        <a href="#section-7">八、异常与边界</a>
+        <a href="#section-8">九、数据追踪</a>
+        <a href="#section-9">十、未来规划</a>
+        <a href="#section-10">十一、附件</a>
+    </nav>
+
+    <div class="main-content">
+        <!-- 项目标题 -->
+        <header class="mb-8">
+            <div class="flex items-center gap-3 mb-2">
+                <h1 class="mb-0">天猫会员兑礼小程序</h1>
+                <span class="version-badge">v1.0</span>
+            </div>
+            <p class="text-gray-500">产品需求文档 (Product Requirements Document)</p>
+            <div class="mt-4 flex gap-4 text-sm text-gray-500">
+                <span>创建日期：2026-03-31</span>
+                <span>最后更新：2026-03-31</span>
+                <span>状态：初稿</span>
+            </div>
+        </header>
+
+        <!-- 一、项目信息与版本记录 -->
+        <section id="section-0">
+            <h2>一、项目信息与版本记录</h2>
+            <table>
+                <tr><th width="150">项目名称</th><td>天猫会员兑礼小程序</td></tr>
+                <tr><th>项目类型</th><td>从0到1新建项目</td></tr>
+                <tr><th>端口</th><td>会员小程序端、B端管理端</td></tr>
+                <tr><th>对接系统</th><td>会员信息中台、兑礼中台</td></tr>
+                <tr><th>目标用户</th><td>C端：天猫店铺会员 / B端：CRM活动运营、IT产品运营</td></tr>
+            </table>
+
+            <h3>版本记录</h3>
+            <table>
+                <thead>
+                    <tr><th>版本号</th><th>更新日期</th><th>更新内容</th><th>负责人</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>v1.0</td><td>2026-03-31</td><td>初版PRD，包含基础需求框架和功能清单</td><td>待定</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 二、需求背景 -->
+        <section id="section-1">
+            <h2>二、需求背景</h2>
+            <h3>2.1 现状与痛点</h3>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>积分价值感知弱</strong>：会员积累的积分缺乏多样化的消耗渠道，积分价值感不强</li>
+                <li><strong>用户粘性不足</strong>：现有积分使用场景有限，难以有效提升用户活跃度和留存</li>
+                <li><strong>渠道覆盖不足</strong>：目前兑礼功能仅存在于其他渠道，天猫小程序端尚未覆盖</li>
+            </ul>
+
+            <h3>2.2 为什么现在做</h3>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>天猫小程序生态成熟，用户触达成本低</li>
+                <li>可通过短信、小红书、淘宝会员页等多渠道精准推广</li>
+                <li>打通积分消耗链路，带动会员复购</li>
+            </ul>
+        </section>
+
+        <!-- 三、需求目标 -->
+        <section id="section-2">
+            <h2>三、需求目标</h2>
+            <table>
+                <thead>
+                    <tr><th>目标类型</th><th>描述</th><th>衡量指标</th><th>目标值</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>核心目标</td><td>提升积分消耗率</td><td>月积分消耗量/月积分发放量</td><td>待定</td></tr>
+                    <tr><td>核心目标</td><td>增加会员活跃度</td><td>小程序月活跃用户数（MAU）</td><td>待定</td></tr>
+                    <tr><td>核心目标</td><td>带动复购</td><td>兑礼用户30天内复购率</td><td>待定</td></tr>
+                    <tr><td>过程指标</td><td>活动曝光</td><td>活动页面UV/PV</td><td>待定</td></tr>
+                    <tr><td>过程指标</td><td>兑换转化率</td><td>兑换订单数/活动UV</td><td>待定</td></tr>
+                </tbody>
+            </table>
+            <p class="text-sm text-gray-500 mt-2">* 目标值需与业务方确认后补充</p>
+        </section>
+
+        <!-- 四、用户与使用场景 -->
+        <section id="section-3">
+            <h2>三、用户与使用场景</h2>
+
+            <h3>3.1 用户角色</h3>
+            <table>
+                <thead>
+                    <tr><th>角色</th><th>描述</th><th>使用频率</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>C端 - 会员用户</strong></td><td>天猫店铺会员，拥有一定积分余额</td><td>按需使用</td></tr>
+                    <tr><td><strong>B端 - CRM活动运营</strong></td><td>品牌方运营人员，负责兑礼活动的创建与管理</td><td>活动期间每周</td></tr>
+                    <tr><td><strong>B端 - IT产品运营</strong></td><td>负责系统监控与异常处理</td><td>收到预警时</td></tr>
+                </tbody>
+            </table>
+
+            <h3>3.2 用户旅程图 (User Journey Map)</h3>
+            <table>
+                <thead>
+                    <tr><th>阶段</th><th>用户触点</th><th>用户行为</th><th>痛点/情绪</th><th>产品机会点</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. 活动触达</strong></td>
+                        <td>短信、小红书、淘宝会员页</td>
+                        <td>收到推广信息，产生兴趣</td>
+                        <td>🤔 信息是否可信？</td>
+                        <td>品牌背书、活动真实性标识</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. 进入小程序</strong></td>
+                        <td>天猫小程序入口</td>
+                        <td>点击链接进入兑礼页面</td>
+                        <td>😐 加载速度？界面是否清晰？</td>
+                        <td>快速加载、清晰的活动引导</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3. 浏览商品</strong></td>
+                        <td>兑礼商品列表页</td>
+                        <td>浏览可兑换商品，筛选心仪商品</td>
+                        <td>😊 有没有喜欢的？积分够不够？</td>
+                        <td>积分余额实时展示、商品分类筛选、积分排序</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4. 选择兑换</strong></td>
+                        <td>商品详情页</td>
+                        <td>确认商品信息，点击兑换</td>
+                        <td>🤔 规则清楚吗？</td>
+                        <td>兑换规则说明、积分扣减预览</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5. 填写地址</strong></td>
+                        <td>地址选择页面</td>
+                        <td>从淘宝地址库选择收货地址</td>
+                        <td>😐 地址是否准确？</td>
+                        <td>淘宝地址一键同步、默认地址标识</td>
+                    </tr>
+                    <tr>
+                        <td><strong>6. 确认兑换</strong></td>
+                        <td>订单确认页</td>
+                        <td>确认信息，提交兑换</td>
+                        <td>😰 积分扣减是否成功？</td>
+                        <td>扣减成功明确反馈、失败原因说明</td>
+                    </tr>
+                    <tr>
+                        <td><strong>7. 查看订单</strong></td>
+                        <td>订单列表/详情页</td>
+                        <td>查看兑换记录和订单状态</td>
+                        <td>😊 什么时候发货？</td>
+                        <td>订单状态实时更新、物流单号展示</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 五、需求功能清单 -->
+        <section id="section-4">
+            <h2>四、需求功能清单</h2>
+
+            <h3>4.1 小程序端功能</h3>
+            <table>
+                <thead>
+                    <tr><th>模块</th><th>功能点</th><th>优先级</th><th>说明</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td rowspan="3"><strong>会员信息</strong></td><td>会员信息获取</td><td>P0</td><td>通过淘宝接口获取会员积分、等级信息</td></tr>
+                    <tr><td>积分余额展示</td><td>P0</td><td>首页/商品页实时展示当前可用积分</td></tr>
+                    <tr><td>会员等级展示</td><td>P1</td><td>展示会员等级标识</td></tr>
+                    <tr><td rowspan="4"><strong>兑礼商品</strong></td><td>商品列表展示</td><td>P0</td><td>展示可兑换商品列表，支持分类筛选</td></tr>
+                    <tr><td>商品详情展示</td><td>P0</td><td>展示商品图片、名称、所需积分、兑换规则</td></tr>
+                    <tr><td>商品库存状态</td><td>P0</td><td>展示有货/无货状态（由中台控制）</td></tr>
+                    <tr><td>积分排序/筛选</td><td>P1</td><td>按积分高低排序，筛选积分区间</td></tr>
+                    <tr><td rowspan="2"><strong>地址管理</strong></td><td>地址选择</td><td>P0</td><td>通过淘宝接口获取用户地址列表</td></tr>
+                    <tr><td>默认地址标识</td><td>P0</td><td>展示并优先选择用户默认地址</td></tr>
+                    <tr><td rowspan="3"><strong>订单管理</strong></td><td>兑换订单列表</td><td>P0</td><td>展示用户所有兑换订单</td></tr>
+                    <tr><td>订单详情页</td><td>P0</td><td>展示订单状态、商品信息、物流单号</td></tr>
+                    <tr><td>订单状态展示</td><td>P0</td><td>已完成/已取消等状态</td></tr>
+                </tbody>
+            </table>
+
+            <h3>4.2 管理端功能</h3>
+            <table>
+                <thead>
+                    <tr><th>模块</th><th>功能点</th><th>优先级</th><th>说明</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td rowspan="4"><strong>活动管理</strong></td><td>创建兑礼活动</td><td>P0</td><td>配置活动名称、时间、渠道、店铺、商品等</td></tr>
+                    <tr><td>启用/禁用活动</td><td>P0</td><td>一键开关活动状态</td></tr>
+                    <tr><td>活动配置编辑</td><td>P0</td><td>修改活动基础信息和商品配置</td></tr>
+                    <tr><td>活动列表管理</td><td>P0</td><td>多维度筛选、搜索活动</td></tr>
+                    <tr><td rowspan="3"><strong>信息看板</strong></td><td>活动曝光数据</td><td>P0</td><td>UV/PV等曝光埋点数据展示</td></tr>
+                    <tr><td>兑礼订单报表</td><td>P0</td><td>订单量、兑换转化率等数据</td></tr>
+                    <tr><td>用户行为日志</td><td>P1</td><td>C端用户操作异常埋点记录</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 六、详细方案 -->
+        <section id="section-5">
+            <h2>五、详细方案</h2>
+            <div class="placeholder">
+                <p class="font-semibold">待原型确认后补充</p>
+                <p class="text-sm mt-2">详细方案将包含每个功能模块的交互流程图、详细规则描述和原型切片</p>
+            </div>
+        </section>
+
+        <!-- 七、业务流程图 -->
+        <section id="section-6">
+            <h2>六、业务流程图</h2>
+            <h3>6.1 正向流程（兑礼成功）</h3>
+            <div class="placeholder">
+                <p>用户兑礼 → 积分扣减 → 订单记录 → 订单回传 → 订单状态="已完成"</p>
+                <p class="text-sm mt-2">* 详细的Mermaid流程图待原型确认后补充</p>
+            </div>
+
+            <h3>6.2 逆向流程（兑礼失败）</h3>
+            <div class="placeholder">
+                <p>用户兑礼 → 积分扣减 → 扣减失败 → 订单状态="已取消"</p>
+                <p class="text-sm mt-2">* 详细的Mermaid流程图待原型确认后补充</p>
+            </div>
+        </section>
+
+        <!-- 八、异常与边界处理 -->
+        <section id="section-7">
+            <h2>七、异常与边界处理</h2>
+            <table>
+                <thead>
+                    <tr><th>异常场景</th><th>触发条件</th><th>处理方式</th><th>用户反馈</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>积分扣减失败</strong></td>
+                        <td>会员信息中台返回扣减失败</td>
+                        <td>订单状态置为"已取消"</td>
+                        <td>Toast提示："兑换失败，积分扣减失败"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>订单同步失败</strong></td>
+                        <td>兑礼中台返回订单回传失败</td>
+                        <td>钉钉预警，人工运维重推</td>
+                        <td>用户端显示订单状态正常（后台异步处理）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>商品无货</strong></td>
+                        <td>兑礼中台返回库存为0</td>
+                        <td>商品展示"已兑完"状态，禁止兑换</td>
+                        <td>按钮置灰，提示"商品已兑完"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>积分不足</strong></td>
+                        <td>用户积分小于商品所需积分</td>
+                        <td>禁止兑换</td>
+                        <td>按钮置灰，提示"积分不足"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>网络异常</strong></td>
+                        <td>请求超时或网络断开</td>
+                        <td>重试机制或提示用户检查网络</td>
+                        <td>Toast提示："网络异常，请重试"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>地址为空</strong></td>
+                        <td>淘宝接口返回地址列表为空</td>
+                        <td>引导用户去淘宝APP添加地址</td>
+                        <td>提示"暂无收货地址，请先添加"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>活动未开始/已结束</strong></td>
+                        <td>当前时间不在活动时间范围内</td>
+                        <td>展示活动状态提示</td>
+                        <td>提示"活动未开始"或"活动已结束"</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 九、数据追踪与埋点 -->
+        <section id="section-8">
+            <h2>八、数据追踪与埋点</h2>
+            <table>
+                <thead>
+                    <tr><th>埋点事件</th><th>触发位置</th><th>关键参数</th><th>用途</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>活动页曝光</td><td>小程序首页/活动页</td><td>活动ID、渠道来源、用户ID</td><td>统计活动曝光量</td></tr>
+                    <tr><td>商品浏览</td><td>商品详情页</td><td>商品ID、活动ID、用户ID</td><td>分析商品热度</td></tr>
+                    <tr><td>点击兑换</td><td>商品详情页-兑换按钮</td><td>商品ID、所需积分、用户ID</td><td>统计兑换意向</td></tr>
+                    <tr><td>兑换成功</td><td>订单确认成功</td><td>订单ID、商品ID、消耗积分</td><td>统计兑换转化</td></tr>
+                    <tr><td>兑换失败</td><td>兑换失败触发</td><td>失败原因、商品ID、用户ID</td><td>异常监控</td></tr>
+                    <tr><td>订单查看</td><td>订单列表/详情页</td><td>订单ID、订单状态</td><td>用户行为分析</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 十、未来演进规划 -->
+        <section id="section-9">
+            <h2>九、未来演进规划</h2>
+            <table>
+                <thead>
+                    <tr><th>阶段</th><th>版本</th><th>功能规划</th><th>说明</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>第一阶段</strong></td><td>v1.0</td><td>基础兑礼功能</td><td>实现核心兑换流程、活动管理、基础看板</td></tr>
+                    <tr><td><strong>第二阶段</strong></td><td>v1.1</td><td>体验优化</td><td>基于数据反馈优化转化漏斗、增加商品推荐</td></tr>
+                    <tr><td><strong>第三阶段</strong></td><td>v2.0</td><td>功能扩展</td><td>支持更多活动形式（限时、专场）、等级专属权益</td></tr>
+                </tbody>
+            </table>
+            <p class="text-sm text-gray-500 mt-2">* 具体规划需与业务方确认后调整</p>
+        </section>
+
+        <!-- 十一、附件 -->
+        <section id="section-10">
+            <h2>十、附件</h2>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>数据字典（待补充）</li>
+                <li>API接口文档（待补充）</li>
+                <li>UI设计稿（待补充）</li>
+            </ul>
+        </section>
+
+        <footer class="mt-12 pt-6 border-t text-sm text-gray-500">
+            <p>文档结束 · 天猫会员兑礼小程序 PRD v1.0</p>
+        </footer>
+    </div>
+
+    <script>
+        // 目录高亮
+        const tocLinks = document.querySelectorAll('.toc a');
+        const sections = document.querySelectorAll('section[id]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
