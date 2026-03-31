@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>天猫会员兑礼小程序 - 原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tmall': '#FF6A00',
+                        'tmall-dark': '#E55D00',
+                        'tmall-light': '#FFF7ED',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif; }
+        .page { display: none; min-height: 100vh; }
+        .page.active { display: flex; flex-direction: column; }
+        .tab-active { color: #FF6A00; }
+        .tab-active i { color: #FF6A00; }
+        .btn-primary { background: linear-gradient(135deg, #FF6A00 0%, #FF8533 100%); }
+        .address-item.selected { border-color: #FF6A00; background: #FFF7ED; }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .sku-item.selected { border-color: #FF6A00; background: #FFF7ED; }
+        .order-status { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .status-completed { background: #ECFDF5; color: #059669; }
+        .status-cancelled { background: #FEF2F2; color: #DC2626; }
+        .status-pending { background: #FFFBEB; color: #D97706; }
+        
+        /* Focus Mode 样式 */
+        .focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; pointer-events: none; opacity: 0; }
+        .focus-overlay.active { opacity: 1; }
+        .focus-highlight { position: relative; z-index: 60; pointer-events: auto; }
+        .focus-highlight::before { content: ''; position: absolute; inset: -4px; border: 3px solid #FF6A00; border-radius: 12px; pointer-events: none; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Focus Mode Overlay -->
+    <div id="focusOverlay" class="focus-overlay"></div>
+
+    <!-- ======== 小程序端 ======== -->
+    <div id="mobileApp" class="max-w-[375px] mx-auto bg-white min-h-screen shadow-xl relative">
+        
+        <!-- 首页 - 商品列表 -->
+        <div id="page-home" class="page active">
+            <!-- 顶部状态栏 -->
+            <div class="bg-gradient-to-r from-tmall to-tmall-dark text-white px-4 pt-12 pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                            <i class="ri-user-3-fill text-xl"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold">淘气值 888</div>
+                            <div class="text-xs text-white/80">黄金会员</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold">2,680</div>
+                        <div class="text-xs text-white/80">可用积分</div>
+                    </div>
+                </div>
+                
+                <!-- 搜索框 -->
+                <div class="bg-white/20 rounded-full px-4 py-2 flex items-center gap-2 text-white/80">
+                    <i class="ri-search-line"></i>
+                    <span class="text-sm">搜索兑换商品</span>
+                </div>
+            </div>
+            
+            <!-- Banner -->
+            <div class="bg-tmall-light p-4">
+                <div class="bg-gradient-to-r from-tmall to-orange-400 rounded-xl p-4 text-white">
+                    <div class="text-lg font-bold mb-1">积分兑好礼</div>
+                    <div class="text-sm opacity-90">100积分起兑，全场包邮</div>
+                </div>
+            </div>
+            
+            <!-- 分类标签 -->
+            <div class="flex gap-4 px-4 py-3 border-b">
+                <span class="text-tmall font-semibold text-sm">全部</span>
+                <span class="text-gray-500 text-sm">数码配件</span>
+                <span class="text-gray-500 text-sm">生活用品</span>
+                <span class="text-gray-500 text-sm">美妆个护</span>
+            </div>
+            
+            <!-- 商品列表 -->
+            <div class="flex-1 overflow-auto pb-20">
+                <div class="p-4 space-y-4">
+                    <!-- 商品1 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden flex" onclick="showPage('detail')">
+                        <div class="w-32 h-32 bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                            <i class="ri-gift-2-line text-4xl text-gray-300"></i>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="font-medium text-sm line-clamp-2">天猫定制保温杯 500ml 大容量不锈钢水杯</div>
+                                <div class="text-xs text-gray-400 mt-1">已兑换 1.2万</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="text-tmall font-bold">500 <span class="text-xs font-normal">积分</span></div>
+                                <button class="bg-tmall text-white text-xs px-3 py-1 rounded-full">兑换</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 商品2 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden flex">
+                        <div class="w-32 h-32 bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                            <i class="ri-headphone-line text-4xl text-gray-300"></i>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="font-medium text-sm line-clamp-2">蓝牙耳机 无线入耳式 超长续航</div>
+                                <div class="text-xs text-gray-400 mt-1">已兑换 856</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="text-tmall font-bold">1,800 <span class="text-xs font-normal">积分</span></div>
+                                <button class="bg-tmall text-white text-xs px-3 py-1 rounded-full">兑换</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 商品3 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden flex opacity-60">
+                        <div class="w-32 h-32 bg-gray-100 flex-shrink-0 flex items-center justify-center relative">
+                            <i class="ri-t-shirt-line text-4xl text-gray-300"></i>
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                <span class="text-white text-xs font-medium">已兑完</span>
+                            </div>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="font-medium text-sm line-clamp-2">纯棉T恤 简约百搭款</div>
+                                <div class="text-xs text-gray-400 mt-1">已兑换 3.5万</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="text-tmall font-bold">380 <span class="text-xs font-normal">积分</span></div>
+                                <button class="bg-gray-300 text-white text-xs px-3 py-1 rounded-full">已兑完</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 商品4 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden flex">
+                        <div class="w-32 h-32 bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                            <i class="ri-cup-line text-4xl text-gray-300"></i>
+                        </div>
+                        <div class="p-3 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="font-medium text-sm line-clamp-2">马克杯 陶瓷咖啡杯 创意设计</div>
+                                <div class="text-xs text-gray-400 mt-1">已兑换 2,340</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="text-tmall font-bold">260 <span class="text-xs font-normal">积分</span></div>
+                                <button class="bg-tmall text-white text-xs px-3 py-1 rounded-full">兑换</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t max-w-[375px] mx-auto">
+                <div class="flex justify-around py-2">
+                    <div class="flex flex-col items-center tab-active">
+                        <i class="ri-home-5-fill text-xl"></i>
+                        <span class="text-xs mt-1">首页</span>
+                    </div>
+                    <div class="flex flex-col items-center text-gray-400" onclick="showPage('orders')">
+                        <i class="ri-file-list-3-line text-xl"></i>
+                        <span class="text-xs mt-1">订单</span>
+                    </div>
+                    <div class="flex flex-col items-center text-gray-400">
+                        <i class="ri-user-line text-xl"></i>
+                        <span class="text-xs mt-1">我的</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 商品详情页 -->
+        <div id="page-detail" class="page">
+            <!-- 顶部导航 -->
+            <div class="flex items-center justify-between px-4 py-3 bg-white border-b sticky top-0">
+                <button onclick="showPage('home')" class="w-8 h-8 flex items-center justify-center">
+                    <i class="ri-arrow-left-s-line text-2xl"></i>
+                </button>
+                <span class="font-semibold">商品详情</span>
+                <button class="w-8 h-8 flex items-center justify-center">
+                    <i class="ri-more-2-fill text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- 商品图片 -->
+            <div class="aspect-square bg-gray-100 flex items-center justify-center">
+                <i class="ri-gift-2-line text-8xl text-gray-300"></i>
+            </div>
+            
+            <!-- 商品信息 -->
+            <div class="p-4 bg-white">
+                <div class="text-tmall text-2xl font-bold mb-2">500 <span class="text-base font-normal">积分</span></div>
+                <div class="text-lg font-semibold">天猫定制保温杯 500ml</div>
+                <div class="text-sm text-gray-500 mt-1">大容量不锈钢水杯 保温保冷</div>
+                <div class="flex items-center gap-4 mt-3 text-sm text-gray-400">
+                    <span>已兑换 1.2万</span>
+                    <span>库存充足</span>
+                </div>
+            </div>
+            
+            <!-- 规格选择 -->
+            <div class="mt-2 p-4 bg-white">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-medium">颜色</span>
+                    <i class="ri-arrow-right-s-line text-gray-400"></i>
+                </div>
+                <div class="flex gap-2">
+                    <button class="sku-item selected px-4 py-2 border-2 rounded-lg text-sm">白色</button>
+                    <button class="sku-item px-4 py-2 border-2 border-gray-200 rounded-lg text-sm">黑色</button>
+                    <button class="sku-item px-4 py-2 border-2 border-gray-200 rounded-lg text-sm">蓝色</button>
+                </div>
+            </div>
+            
+            <!-- 兑换规则 -->
+            <div class="mt-2 p-4 bg-white">
+                <div class="font-medium mb-2">兑换规则</div>
+                <ul class="text-sm text-gray-500 space-y-1">
+                    <li>• 每人限兑 2 件</li>
+                    <li>• 兑换后 3-5 个工作日发货</li>
+                    <li>• 不支持退换货</li>
+                </ul>
+            </div>
+            
+            <!-- 底部操作栏 -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t max-w-[375px] mx-auto">
+                <div class="flex items-center gap-4 p-4">
+                    <button onclick="showPage('home')" class="flex-1 py-3 border border-tmall text-tmall rounded-full font-medium">返回首页</button>
+                    <button onclick="showModal('confirmModal')" class="flex-1 py-3 btn-primary text-white rounded-full font-medium">立即兑换</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 订单确认页 -->
+        <div id="page-confirm" class="page">
+            <div class="flex items-center justify-between px-4 py-3 bg-white border-b sticky top-0">
+                <button onclick="showPage('detail')" class="w-8 h-8 flex items-center justify-center">
+                    <i class="ri-arrow-left-s-line text-2xl"></i>
+                </button>
+                <span class="font-semibold">确认兑换</span>
+                <div class="w-8"></div>
+            </div>
+            
+            <div class="flex-1 overflow-auto pb-32">
+                <!-- 收货地址 -->
+                <div class="mt-2 p-4 bg-white" onclick="showPage('address')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="ri-map-pin-line text-xl text-tmall"></i>
+                            <div>
+                                <div class="font-medium">张三 138****8888</div>
+                                <div class="text-sm text-gray-500 mt-1">浙江省杭州市西湖区xxx街道xxx号</div>
+                            </div>
+                        </div>
+                        <i class="ri-arrow-right-s-line text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- 商品信息 -->
+                <div class="mt-2 p-4 bg-white">
+                    <div class="flex gap-3">
+                        <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="ri-gift-2-line text-2xl text-gray-300"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium">天猫定制保温杯 500ml</div>
+                            <div class="text-sm text-gray-500 mt-1">颜色：白色</div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-tmall font-bold">500 积分</span>
+                                <span class="text-gray-400 text-sm">x1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 积分明细 -->
+                <div class="mt-2 p-4 bg-white">
+                    <div class="font-medium mb-3">积分明细</div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-500">当前积分</span>
+                        <span>2,680</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-500">兑换消耗</span>
+                        <span class="text-tmall">-500</span>
+                    </div>
+                    <div class="border-t pt-2 flex justify-between text-sm font-medium">
+                        <span>兑换后剩余</span>
+                        <span>2,180</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部确认栏 -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t max-w-[375px] mx-auto">
+                <div class="flex items-center justify-between p-4">
+                    <div>
+                        <span class="text-gray-500 text-sm">合计：</span>
+                        <span class="text-tmall font-bold text-xl">500 积分</span>
+                    </div>
+                    <button onclick="showToast('兑换成功', true)" class="px-8 py-3 btn-primary text-white rounded-full font-medium">确认兑换</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 地址选择页 -->
+        <div id="page-address" class="page">
+            <div class="flex items-center justify-between px-4 py-3 bg-white border-b sticky top-0">
+                <button onclick="showPage('confirm')" class="w-8 h-8 flex items-center justify-center">
+                    <i class="ri-arrow-left-s-line text-2xl"></i>
+                </button>
+                <span class="font-semibold">选择收货地址</span>
+                <button class="text-tmall text-sm">新增地址</button>
+            </div>
+            
+            <div class="flex-1 overflow-auto">
+                <div class="p-4 space-y-3">
+                    <!-- 地址1 -->
+                    <div class="address-item selected p-4 border-2 rounded-xl" onclick="selectAddress(this)">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium">张三</span>
+                                <span class="text-sm text-gray-500">138****8888</span>
+                            </div>
+                            <div class="text-xs bg-tmall text-white px-2 py-0.5 rounded">默认</div>
+                        </div>
+                        <div class="text-sm text-gray-600">浙江省杭州市西湖区xxx街道xxx号</div>
+                    </div>
+                    
+                    <!-- 地址2 -->
+                    <div class="address-item p-4 border-2 border-gray-200 rounded-xl" onclick="selectAddress(this)">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium">李四</span>
+                                <span class="text-sm text-gray-500">139****9999</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600">浙江省杭州市滨江区xxx路xxx号</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t max-w-[375px] mx-auto p-4">
+                <button onclick="showPage('confirm')" class="w-full py-3 btn-primary text-white rounded-full font-medium">确认使用</button>
+            </div>
+        </div>
+        
+        <!-- 订单列表页 -->
+        <div id="page-orders" class="page">
+            <div class="px-4 py-3 bg-white border-b sticky top-0">
+                <span class="font-semibold">我的订单</span>
+            </div>
+            
+            <!-- 订单状态标签 -->
+            <div class="flex border-b bg-white">
+                <button class="flex-1 py-3 text-sm text-tmall border-b-2 border-tmall">全部</button>
+                <button class="flex-1 py-3 text-sm text-gray-500">已完成</button>
+                <button class="flex-1 py-3 text-sm text-gray-500">已取消</button>
+            </div>
+            
+            <div class="flex-1 overflow-auto pb-20">
+                <div class="p-4 space-y-3">
+                    <!-- 订单1 - 已完成 -->
+                    <div class="bg-white rounded-xl p-4" onclick="showPage('order-detail')">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">2026-03-31 14:30</span>
+                            <span class="order-status status-completed">已完成</span>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="ri-gift-2-line text-xl text-gray-300"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium text-sm">天猫定制保温杯 500ml</div>
+                                <div class="text-sm text-gray-500 mt-1">颜色：白色</div>
+                                <div class="text-tmall font-semibold mt-2">500 积分</div>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t flex justify-between items-center">
+                            <span class="text-xs text-gray-400">物流单号：SF1234567890</span>
+                            <button class="text-sm text-tmall">查看物流</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 订单2 - 已取消 -->
+                    <div class="bg-white rounded-xl p-4 opacity-70">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-500">2026-03-30 10:15</span>
+                            <span class="order-status status-cancelled">已取消</span>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="ri-cup-line text-xl text-gray-300"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium text-sm">马克杯 陶瓷咖啡杯</div>
+                                <div class="text-sm text-gray-500 mt-1">颜色：蓝色</div>
+                                <div class="text-gray-400 font-semibold mt-2">260 积分</div>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t">
+                            <span class="text-xs text-red-500">取消原因：积分扣减失败</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t max-w-[375px] mx-auto">
+                <div class="flex justify-around py-2">
+                    <div class="flex flex-col items-center text-gray-400" onclick="showPage('home')">
+                        <i class="ri-home-5-line text-xl"></i>
+                        <span class="text-xs mt-1">首页</span>
+                    </div>
+                    <div class="flex flex-col items-center tab-active">
+                        <i class="ri-file-list-3-fill text-xl"></i>
+                        <span class="text-xs mt-1">订单</span>
+                    </div>
+                    <div class="flex flex-col items-center text-gray-400">
+                        <i class="ri-user-line text-xl"></i>
+                        <span class="text-xs mt-1">我的</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 订单详情页 -->
+        <div id="page-order-detail" class="page">
+            <div class="flex items-center justify-between px-4 py-3 bg-white border-b sticky top-0">
+                <button onclick="showPage('orders')" class="w-8 h-8 flex items-center justify-center">
+                    <i class="ri-arrow-left-s-line text-2xl"></i>
+                </button>
+                <span class="font-semibold">订单详情</span>
+                <div class="w-8"></div>
+            </div>
+            
+            <div class="flex-1 overflow-auto">
+                <!-- 订单状态卡片 -->
+                <div class="bg-gradient-to-r from-tmall to-orange-400 p-6 text-white">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="ri-checkbox-circle-fill text-2xl"></i>
+                        <span class="text-lg font-semibold">已完成</span>
+                    </div>
+                    <div class="text-sm opacity-90">商品已发货，请注意查收</div>
+                </div>
+                
+                <!-- 物流信息 -->
+                <div class="mt-2 p-4 bg-white">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ri-truck-line text-xl text-tmall"></i>
+                        <span class="font-medium">物流信息</span>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-sm font-medium">顺丰速运</div>
+                        <div class="text-sm text-gray-500 mt-1">运单号：SF1234567890</div>
+                    </div>
+                </div>
+                
+                <!-- 商品信息 -->
+                <div class="mt-2 p-4 bg-white">
+                    <div class="flex gap-3">
+                        <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <i class="ri-gift-2-line text-2xl text-gray-300"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium">天猫定制保温杯 500ml</div>
+                            <div class="text-sm text-gray-500 mt-1">颜色：白色 | 数量：1</div>
+                            <div class="text-tmall font-semibold mt-2">500 积分</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 收货地址 -->
+                <div class="mt-2 p-4 bg-white">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="ri-map-pin-line text-xl text-tmall"></i>
+                        <span class="font-medium">收货地址</span>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        张三 138****8888<br>
+                        浙江省杭州市西湖区xxx街道xxx号
+                    </div>
+                </div>
+                
+                <!-- 订单信息 -->
+                <div class="mt-2 p-4 bg-white">
+                    <div class="font-medium mb-3">订单信息</div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">订单编号</span>
+                            <span>DD202603311430001</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">兑换时间</span>
+                            <span>2026-03-31 14:30:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">积分消耗</span>
+                            <span class="text-tmall">-500</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部操作 -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t max-w-[375px] mx-auto p-4">
+                <div class="flex gap-3">
+                    <button class="flex-1 py-3 border border-gray-300 rounded-full text-sm">联系客服</button>
+                    <button class="flex-1 py-3 btn-primary text-white rounded-full text-sm">查看物流</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认兑换弹窗 -->
+    <div id="confirmModal" class="modal">
+        <div class="bg-white rounded-2xl w-80 mx-4 p-6">
+            <div class="text-center mb-4">
+                <i class="ri-exchange-circle-line text-4xl text-tmall"></i>
+            </div>
+            <div class="text-center mb-6">
+                <div class="font-semibold text-lg mb-2">确认兑换</div>
+                <div class="text-sm text-gray-500">兑换后将扣除 500 积分，是否继续？</div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="hideModal('confirmModal')" class="flex-1 py-3 border border-gray-300 rounded-full text-sm">取消</button>
+                <button onclick="hideModal('confirmModal'); showPage('confirm')" class="flex-1 py-3 btn-primary text-white rounded-full text-sm">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast hidden">
+        <div class="bg-black/80 text-white px-6 py-3 rounded-full text-sm"></div>
+    </div>
+    
+    <!-- 兑换成功弹窗 -->
+    <div id="successModal" class="modal">
+        <div class="bg-white rounded-2xl w-80 mx-4 p-6">
+            <div class="text-center mb-4">
+                <i class="ri-checkbox-circle-fill text-5xl text-green-500"></i>
+            </div>
+            <div class="text-center mb-6">
+                <div class="font-semibold text-lg mb-2">兑换成功</div>
+                <div class="text-sm text-gray-500">积分已扣除，请等待发货</div>
+            </div>
+            <button onclick="hideModal('successModal'); showPage('orders')" class="w-full py-3 btn-primary text-white rounded-full">查看订单</button>
+        </div>
+    </div>
+    
+    <script>
+        // 获取URL参数 - Focus Mode支持
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                focus: params.get('focus'),
+                sandbox: params.get('sandbox')
+            };
+        }
+        
+        // 初始化Focus Mode
+        function initFocusMode() {
+            const params = getUrlParams();
+            if (params.focus && params.sandbox) {
+                const focusElement = document.getElementById(params.focus);
+                if (focusElement) {
+                    document.getElementById('focusOverlay').classList.add('active');
+                    
+                    // 将focus元素置于顶层
+                    const parent = focusElement.parentElement;
+                    if (parent) {
+                        parent.classList.add('focus-highlight');
+                    }
+                }
+            }
+        }
+        
+        // 页面切换
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+        }
+        
+        // 弹窗控制
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+        
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        // Toast提示
+        function showToast(message, isSuccess = false) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('div').textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                if (isSuccess) {
+                    showModal('successModal');
+                }
+            }, 2000);
+        }
+        
+        // 地址选择
+        function selectAddress(element) {
+            document.querySelectorAll('.address-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+        
+        // SKU选择
+        document.querySelectorAll('.sku-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sku-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+        
+        // 点击遮罩关闭弹窗
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                }
+            });
+        });
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initFocusMode();
+        });
+    </script>
+</body>
+</html>
