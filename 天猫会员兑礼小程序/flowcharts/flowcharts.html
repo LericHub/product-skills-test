@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天猫会员兑礼小程序 - 业务流程图</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#FF6A00',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#E55D00',
+                lineColor: '#6B7280',
+                secondaryColor: '#FFF7ED',
+                tertiaryColor: '#F3F4F6'
+            }
+        });
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+        .mermaid { background: white; padding: 20px; border-radius: 12px; margin: 20px 0; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-5xl mx-auto py-8 px-4">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">业务流程图</h1>
+        <p class="text-gray-500 mb-8">天猫会员兑礼小程序核心业务流程</p>
+        
+        <!-- 流程图1：用户兑礼主流程 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span class="w-8 h-8 bg-tmall text-white rounded-lg flex items-center justify-center text-sm">1</span>
+                用户兑礼主流程
+            </h2>
+            <div class="mermaid">
+flowchart TD
+    A([用户进入兑礼小程序]) --> B[浏览兑礼商品列表]
+    B --> C{选择商品}
+    C -->|有货| D[进入商品详情页]
+    C -->|已兑完| E[显示"已兑完"按钮]
+    E --> B
+    
+    D --> F{检查积分是否充足}
+    F -->|积分不足| G[按钮置灰<br/>显示"积分不足"]
+    F -->|积分充足| H[点击"立即兑换"]
+    
+    H --> I[选择收货地址]
+    I --> J[确认兑换信息]
+    J --> K{确认兑换}
+    K -->|取消| D
+    K -->|确认| L[调用积分扣减接口]
+    
+    L --> M{扣减结果}
+    M -->|成功| N[创建兑礼订单]
+    M -->|失败| O[Toast提示<br/>"兑换失败，积分扣减失败"]
+    O --> P[订单状态=已取消]
+    
+    N --> Q[调用订单回传接口]
+    Q --> R{回传结果}
+    R -->|成功| S[订单状态=已完成]
+    R -->|失败| T[钉钉预警<br/>人工运维重推]
+    T --> S
+    
+    S --> U[跳转订单详情页]
+    
+    style A fill:#FF6A00,stroke:#E55D00
+    style S fill:#059669,stroke:#047857
+    style P fill:#DC2626,stroke:#B91C1C
+    style O fill:#DC2626,stroke:#B91C1C
+    style T fill:#D97706,stroke:#B45309
+            </div>
+        </div>
+        
+        <!-- 流程图2：订单状态流转 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span class="w-8 h-8 bg-tmall text-white rounded-lg flex items-center justify-center text-sm">2</span>
+                订单状态流转图
+            </h2>
+            <div class="mermaid">
+flowchart LR
+    A[待确认] -->|用户确认| B[积分扣减中]
+    B -->|扣减成功| C[已创建]
+    B -->|扣减失败| D[已取消]
+    C -->|回传成功| E[已完成]
+    C -->|回传失败| F[同步异常]
+    F -->|人工重推| E
+    
+    style A fill:#6B7280,stroke:#4B5563
+    style B fill:#D97706,stroke:#B45309
+    style C fill:#FF6A00,stroke:#E55D00
+    style D fill:#DC2626,stroke:#B91C1C
+    style E fill:#059669,stroke:#047857
+    style F fill:#D97706,stroke:#B45309
+            </div>
+        </div>
+        
+        <!-- 流程图3：地址选择流程 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span class="w-8 h-8 bg-tmall text-white rounded-lg flex items-center justify-center text-sm">3</span>
+                地址选择流程
+            </h2>
+            <div class="mermaid">
+flowchart TD
+    A([进入地址选择页]) --> B[调用淘宝地址接口]
+    B --> C{接口返回结果}
+    C -->|成功| D[展示地址列表]
+    C -->|失败| E[显示"网络异常"]
+    E --> B
+    
+    D --> F{地址列表是否为空}
+    F -->|为空| G[提示"暂无收货地址<br/>请先去淘宝APP添加"]
+    F -->|非空| H[展示默认地址]
+    
+    H --> I{用户操作}
+    I -->|选择其他地址| J[切换选中状态]
+    I -->|点击"新增地址"| K[跳转淘宝地址管理]
+    I -->|确认使用| L[返回确认页]
+    
+    J --> I
+    
+    style A fill:#FF6A00,stroke:#E55D00
+    style L fill:#059669,stroke:#047857
+    style G fill:#D97706,stroke:#B45309
+    style E fill:#DC2626,stroke:#B91C1C
+            </div>
+        </div>
+        
+        <!-- 流程图4：异常处理流程 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span class="w-8 h-8 bg-tmall text-white rounded-lg flex items-center justify-center text-sm">4</span>
+                异常处理流程
+            </h2>
+            <div class="mermaid">
+flowchart TD
+    A[异常发生] --> B{异常类型}
+    
+    B -->|积分扣减失败| C[记录订单状态=已取消]
+    C --> D[前端Toast提示]
+    D --> E["提示文案：<br/>兑换失败，积分扣减失败"]
+    
+    B -->|订单回传失败| F[记录异常日志]
+    F --> G[发送钉钉预警]
+    G --> H[人工运维介入]
+    H --> I[手动重推订单]
+    I --> J{重推结果}
+    J -->|成功| K[更新订单状态=已完成]
+    J -->|失败| L[持续预警]
+    
+    B -->|网络异常| M[前端Toast提示]
+    M --> N["提示文案：<br/>网络异常，请重试"]
+    N --> O[用户可手动重试]
+    
+    B -->|库存不足| P[按钮置灰]
+    P --> Q["提示文案：<br/>商品已兑完"]
+    
+    B -->|积分不足| R[按钮置灰]
+    R --> S["提示文案：<br/>积分不足"]
+    
+    style A fill:#FF6A00,stroke:#E55D00
+    style E fill:#DC2626,stroke:#B91C1C
+    style N fill:#D97706,stroke:#B45309
+    style Q fill:#6B7280,stroke:#4B5563
+    style S fill:#6B7280,stroke:#4B5563
+            </div>
+        </div>
+        
+        <!-- 流程图5：管理端活动管理流程 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span class="w-8 h-8 bg-tmall text-white rounded-lg flex items-center justify-center text-sm">5</span>
+                管理端活动管理流程
+            </h2>
+            <div class="mermaid">
+flowchart TD
+    A([运营人员登录]) --> B[进入活动管理]
+    B --> C{操作类型}
+    
+    C -->|创建活动| D[填写活动信息]
+    D --> E[选择推广渠道]
+    E --> F[选择关联店铺]
+    F --> G[选择兑换商品]
+    G --> H[提交创建]
+    H --> I{创建结果}
+    I -->|成功| J[活动状态=进行中]
+    I -->|失败| K[提示错误信息]
+    
+    C -->|编辑活动| L[加载活动配置]
+    L --> M[修改配置信息]
+    M --> N[保存修改]
+    
+    C -->|启用/禁用| O{当前状态}
+    O -->|进行中| P[确认禁用]
+    P --> Q[活动状态=已禁用]
+    O -->|已禁用| R[确认启用]
+    R --> S[活动状态=进行中]
+    
+    style A fill:#FF6A00,stroke:#E55D00
+    style J fill:#059669,stroke:#047857
+    style Q fill:#6B7280,stroke:#4B5563
+    style S fill:#059669,stroke:#047857
+            </div>
+        </div>
+        
+        <footer class="text-center text-gray-400 text-sm mt-8">
+            天猫会员兑礼小程序 - 业务流程图 v1.0
+        </footer>
+    </div>
+</body>
+</html>
